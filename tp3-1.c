@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <math.h>
 
+double fact(int);
+double CalculateS(double, double, double, size_t);
 
 typedef struct {
     size_t degree;
@@ -59,15 +61,74 @@ void PolynomialPrint(Polynomial *p) {
 }
 
 
-int main(void) {
-    Polynomial *p = PolynomialNew(3);
-    p->coefficients[0] = -3;
-    p->coefficients[1] =  1;
-    p->coefficients[3] =  2;
+Polynomial* InterpolationPolynomialNew(double (*f)(double), size_t degree,
+                                       double start, double end) {
+    Polynomial *p = PolynomialNew(degree);
+    double table[degree + 1][degree + 1]; /* Containing Delta_y, Delta^2_y, ... */
+    double h = (end - start) / degree;
 
-    PolynomialPrint(p);
-    printf("%g\n", PolynomialEvaluate(p, 4));
-    PolynomialFree(p);
+    /* Initialize table */
+    for (size_t i = 0; i <= degree; ++i) {
+        table[0][i] = (*f)(start + i*h);
+    }
+
+    /* Fill up the table */
+    for (size_t i = 1; i <= degree; ++i) {
+        for (size_t j = 0; j <= degree - i; ++j) {
+            table[i][j] = table[i-1][j+1] - table[i-1][j];
+        }
+    }
+
+    /* Assign coefficients in polynomial. */
+    for (size_t i = 0; i <= degree; ++i) {
+        p->coefficients[i] = table[i][0] / fact(i);
+    }
+
+    return p;
+}
+
+
+double InterpolationPolynomialCompute(Polynomial *p, double x, double x0, double h) {
+    double y = 0.0;
+
+    for (size_t i = 0; i <= p->degree; ++i) {
+        y += p->coefficients[i] * CalculateS(x, x0, h, i);
+    }
+    return y;
+}
+
+
+double CalculateS(double x, double x0, double h, size_t n) {
+    double s = (x - x0) / h;
+    double p = 1.0;
+
+    for (size_t i = 0; i < n; ++i) {
+        p *= (s-i);
+    }
+
+    return p;
+}
+
+double fact(int n) {
+    double p = 1.0;
+    for (int i = 1; i <= n; ++i) {
+        p *= i;
+    }
+    return p;
+}
+
+
+double f(double x) {
+    return sin(x);
+}
+
+int main(void) {
+    for (size_t i = 1; i <= 5; ++i) {
+        double h = (1.7 - 0.1) / i;
+        p = InterpolationPolynomialNew(&f, i, 0.1, 1.7);
+        printf("%g %g\n", f(0.8), InterpolationPolynomialCompute(p, 0.8, 0.1, h));
+        PolynomialFree(p);
+    }
 
 
     return EXIT_SUCCESS;
