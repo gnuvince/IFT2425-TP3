@@ -5,12 +5,20 @@
 double fact(int);
 double CalculateS(double, double, double, size_t);
 
+
+/* A polynomial structure contains an non-negative degree,
+ * and a list of coefficients.
+ */
 typedef struct {
     size_t degree;
     double *coefficients;
 } Polynomial;
 
 
+/* Allocate a new polynomial of degree n.  Because we have
+ * coefficients from 0 to n inclusive, we allocate a table of
+ * n+1 coefficients.  All coefficients are initialized to 0.
+ */
 Polynomial* PolynomialNew(size_t degree) {
     double *coefficients = calloc(degree+1, sizeof(double));
     if (coefficients == NULL) {
@@ -31,12 +39,16 @@ Polynomial* PolynomialNew(size_t degree) {
 }
 
 
+/* Free the space taken by a polynomial. */
 void PolynomialFree(Polynomial *p) {
     free(p->coefficients);
     free(p);
 }
 
 
+/* Given a value for x, evaluate the polynomial.  Not used for
+ * interpolation polynomials.
+ */
 double PolynomialEvaluate(Polynomial *p, double x) {
     double sum = 0.0;
 
@@ -47,7 +59,7 @@ double PolynomialEvaluate(Polynomial *p, double x) {
     return sum;
 }
 
-
+/* Display a polynomial. */
 void PolynomialPrint(Polynomial *p) {
     for (size_t i = p->degree; i != (size_t)-1; --i) {
         if (p->coefficients[i] != 0) {
@@ -61,6 +73,10 @@ void PolynomialPrint(Polynomial *p) {
 }
 
 
+/* Using Newton-Gregory's method, allocate and return a new collocation
+ * polynomial of degree `degree` that passes through `degree+1` points
+ * in the interval [start, end].
+ */
 Polynomial* InterpolationPolynomialNew(double (*f)(double), size_t degree,
                                        double start, double end) {
     Polynomial *p = PolynomialNew(degree);
@@ -125,11 +141,10 @@ double f(double x) {
 int main(void) {
     for (size_t i = 1; i <= 5; ++i) {
         double h = (1.7 - 0.1) / i;
-        p = InterpolationPolynomialNew(&f, i, 0.1, 1.7);
+        Polynomial *p = InterpolationPolynomialNew(&f, i, 0.1, 1.7);
         printf("%g %g\n", f(0.8), InterpolationPolynomialCompute(p, 0.8, 0.1, h));
         PolynomialFree(p);
     }
-
 
     return EXIT_SUCCESS;
 }
