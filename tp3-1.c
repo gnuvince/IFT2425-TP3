@@ -93,12 +93,12 @@ Polynomial* InterpolationPolynomialNew(double (*f)(double), size_t degree,
         }
     }
 
-    /* for (size_t i = 0; i <= degree; ++i) { */
-    /*     for (size_t j = 0; j <= degree - i; ++j) { */
-    /*         printf("%+.10lf\t", table[i][j]); */
-    /*     } */
-    /*     putchar('\n'); */
-    /* } */
+    for (size_t i = 0; i <= degree; ++i) {
+        for (size_t j = 0; j <= degree - i; ++j) {
+            printf("%+.5lf\t", table[i][j]);
+        }
+        putchar('\n');
+    }
 
 
 
@@ -113,7 +113,7 @@ Polynomial* InterpolationPolynomialNew(double (*f)(double), size_t degree,
 }
 
 
-double InterpolationPolynomialCompute(Polynomial *p, double x, double start, double end) {
+double InterpolationPolynomialEval(Polynomial *p, double x, double start, double end) {
     double y = 0.0;
     double h = (end - start) / p->degree;
 
@@ -127,6 +127,20 @@ double InterpolationPolynomialCompute(Polynomial *p, double x, double start, dou
 
     return y;
 }
+
+
+void InterpolationPolynomialPrint(Polynomial *p, double start, double end) {
+    double h = (end - start) / p->degree;
+
+    for (size_t i = p->degree; i != (size_t)-1; --i) {
+        printf("%+g", p->coefficients[i]);
+        for (size_t j = 0; j < i; ++j) {
+            printf("*(x - %g)", start + j*h);
+        }
+    }
+    putchar('\n');
+}
+
 
 double fact(int n) {
     double p = 1.0;
@@ -142,12 +156,13 @@ double f(double x) {
 }
 
 int main(void) {
-    double start = 0;
-    double end = 3*PI;
+    double start = 0.1;
+    double end = 1.7;
+
     for (size_t i = 1; i <= 5; ++i) {
         Polynomial *p = InterpolationPolynomialNew(&f, i, start, end);
-        //PolynomialPrint(p);
-        printf("%g %g\n", f(0.8), InterpolationPolynomialCompute(p, 0.8, start, end));
+        InterpolationPolynomialPrint(p, start, end);
+        printf("%g %g\n", f(0.8), InterpolationPolynomialEval(p, 0.8, start, end));
         PolynomialFree(p);
     }
 
