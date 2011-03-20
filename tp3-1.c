@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <math.h>
 
+#define PI 3.14159265358979323846
+
 double fact(int);
 double CalculateS(double, double, double, size_t);
 
@@ -62,12 +64,7 @@ double PolynomialEvaluate(Polynomial *p, double x) {
 /* Display a polynomial. */
 void PolynomialPrint(Polynomial *p) {
     for (size_t i = p->degree; i != (size_t)-1; --i) {
-        if (p->coefficients[i] != 0) {
-            printf("%.gx^%d", p->coefficients[i], (int)i);
-            if (i != 0) {
-                printf(" + ");
-            }
-        }
+        printf("%+gx^%d", p->coefficients[i], (int)i);
     }
     putchar('\n');
 }
@@ -86,6 +83,7 @@ Polynomial* InterpolationPolynomialNew(double (*f)(double), size_t degree,
     /* Initialize table */
     for (size_t i = 0; i <= degree; ++i) {
         table[0][i] = (*f)(start + i*h);
+        printf("  >> f(%.6lf) = %.6lf\n", (start + i*h), table[0][i]);
     }
 
     /* Fill up the table */
@@ -95,34 +93,39 @@ Polynomial* InterpolationPolynomialNew(double (*f)(double), size_t degree,
         }
     }
 
+    /* for (size_t i = 0; i <= degree; ++i) { */
+    /*     for (size_t j = 0; j <= degree - i; ++j) { */
+    /*         printf("%+.10lf\t", table[i][j]); */
+    /*     } */
+    /*     putchar('\n'); */
+    /* } */
+
+
+
+
+
     /* Assign coefficients in polynomial. */
     for (size_t i = 0; i <= degree; ++i) {
-        p->coefficients[i] = table[i][0] / fact(i);
+        p->coefficients[i] = table[i][0] / (fact(i) * pow(h, i));
     }
 
     return p;
 }
 
 
-double InterpolationPolynomialCompute(Polynomial *p, double x, double x0, double h) {
+double InterpolationPolynomialCompute(Polynomial *p, double x, double start, double end) {
     double y = 0.0;
+    double h = (end - start) / p->degree;
 
     for (size_t i = 0; i <= p->degree; ++i) {
-        y += p->coefficients[i] * CalculateS(x, x0, h, i);
+        double t = 1.0;
+        for (size_t j = 0; j < i; ++j) {
+            t *= (x - (start + j*h));
+        }
+        y += p->coefficients[i] * t;
     }
+
     return y;
-}
-
-
-double CalculateS(double x, double x0, double h, size_t n) {
-    double s = (x - x0) / h;
-    double p = 1.0;
-
-    for (size_t i = 0; i < n; ++i) {
-        p *= (s-i);
-    }
-
-    return p;
 }
 
 double fact(int n) {
@@ -139,10 +142,12 @@ double f(double x) {
 }
 
 int main(void) {
+    double start = 0;
+    double end = 3*PI;
     for (size_t i = 1; i <= 5; ++i) {
-        double h = (1.7 - 0.1) / i;
-        Polynomial *p = InterpolationPolynomialNew(&f, i, 0.1, 1.7);
-        printf("%g %g\n", f(0.8), InterpolationPolynomialCompute(p, 0.8, 0.1, h));
+        Polynomial *p = InterpolationPolynomialNew(&f, i, start, end);
+        //PolynomialPrint(p);
+        printf("%g %g\n", f(0.8), InterpolationPolynomialCompute(p, 0.8, start, end));
         PolynomialFree(p);
     }
 
