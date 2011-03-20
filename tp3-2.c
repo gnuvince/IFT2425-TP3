@@ -2,6 +2,9 @@
 #include <stdlib.h>
 #include <math.h>
 
+#define START 0.0
+#define END   1.0
+
 
 double IntegrateTrapezoid(double (*f)(double), double start, double end, size_t num_intervals) {
     double sum = 0.0;
@@ -35,13 +38,50 @@ double IntegrateSimpson3_8(double (*f)(double), double start, double end) {
 }
 
 
+double Integrate(double (*f)(double), double start, double end, size_t M) {
+    if (M <= 0) {
+        fputs("Not a valid number of intervals.\n", stderr);
+        abort();
+    }
+    else if (M == 1) {
+        return IntegrateTrapezoid(f, start, end, M);
+    }
+    else if (M % 2 == 0) {
+        double h = (end - start) / M;
+        double x0 = start;
+        double sum = 0.0;
+
+        for (size_t i = 0; i < M; i += 2) {
+            sum += IntegrateSimpson1_3(f, x0, x0 + 2*h);
+            x0 += 2*h;
+        }
+
+        return sum;
+    }
+    else {
+        double h = (end - start) / M;
+        double x0 = start;
+        double sum = 0.0;
+
+        for (size_t i = 0; i < M-3; i += 2) {
+            sum += IntegrateSimpson1_3(f, x0, x0 + 2*h);
+            x0 += 2*h;
+        }
+
+        return sum + IntegrateSimpson3_8(f, end - 3*h, end);
+    }
+}
+
+
 double f(double x) {
     return 1.0 / (x*x + x + 1);
 }
 
 int main(void) {
-    printf("%g\n", IntegrateTrapezoid(&f, 0, 6, 100));
-    printf("%g\n", IntegrateSimpson1_3(&f, 0, 6));
-    printf("%g\n", IntegrateSimpson3_8(&f, 0, 6));
+    printf("%g\n", IntegrateTrapezoid(&f, START, END, 100));
+    printf("%g\n", IntegrateSimpson1_3(&f, START, END));
+    printf("%g\n", IntegrateSimpson3_8(&f, START, END));
+    printf("%g\n", Integrate(&f, START, END, 12));
+    printf("%g\n", Integrate(&f, START, END, 13));
     return EXIT_SUCCESS;
 }
