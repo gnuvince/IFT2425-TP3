@@ -91,13 +91,8 @@ int main(int argc, char *argv[]) {
 
     int M = atoi(argv[1]);
 
-
-    /*
     printf("Méthode de Simpson  : %f\n", Integrate(&f, START, END, M));
     printf("Méthode des trapèzes: %f\n", IntegrateTrapezoid(&f, START, END, M));
-    */
-
-    printf("%d, %f, %f\n", M, Integrate(&f, START, END, M), IntegrateTrapezoid(&f, START, END, M));
 
     return EXIT_SUCCESS;
 }
