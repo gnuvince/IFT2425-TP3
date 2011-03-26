@@ -1,0 +1,1 @@
+plot 'tp3-2.csv' using 1:2 title 'Simpson' with lines, 'tp3-2.csv' using 1:3 title 'Trapezoids' with lines, pi/(3*sqrt(3)) title 'I(f)'

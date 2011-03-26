@@ -77,11 +77,27 @@ double f(double x) {
     return 1.0 / (x*x + x + 1);
 }
 
-int main(void) {
-    printf("%g\n", IntegrateTrapezoid(&f, START, END, 100));
-    printf("%g\n", IntegrateSimpson1_3(&f, START, END));
-    printf("%g\n", IntegrateSimpson3_8(&f, START, END));
-    printf("%g\n", Integrate(&f, START, END, 12));
-    printf("%g\n", Integrate(&f, START, END, 13));
+
+void Usage(const char *program_name) {
+    fprintf(stderr, "Utilisation: %s <M>\n", program_name);
+}
+
+
+int main(int argc, char *argv[]) {
+    if (argc != 2) {
+        Usage(argv[0]);
+        return 1;
+    }
+
+    int M = atoi(argv[1]);
+
+
+    /*
+    printf("Méthode de Simpson  : %f\n", Integrate(&f, START, END, M));
+    printf("Méthode des trapèzes: %f\n", IntegrateTrapezoid(&f, START, END, M));
+    */
+
+    printf("%d, %f, %f\n", M, Integrate(&f, START, END, M), IntegrateTrapezoid(&f, START, END, M));
+
     return EXIT_SUCCESS;
 }
