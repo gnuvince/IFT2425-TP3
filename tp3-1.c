@@ -162,6 +162,7 @@ double f(double x) {
 int main(void) {
     for (size_t i = 1; i <= 5; ++i) {
         Polynomial *p = InterpolationPolynomialNew(&f, i, START, END);
+        printf("P%d(x) = ", (int)i);
         InterpolationPolynomialPrint(p, START, END);
         PolynomialFree(p);
     }
