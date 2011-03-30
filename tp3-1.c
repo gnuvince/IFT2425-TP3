@@ -85,7 +85,6 @@ Polynomial* InterpolationPolynomialNew(double (*f)(double), size_t degree,
     /* Initialize table */
     for (size_t i = 0; i <= degree; ++i) {
         table[0][i] = (*f)(start + i*h);
-        //printf("  >> f(%.6lf) = %.6lf\n", (start + i*h), table[0][i]);
     }
 
     /* Fill up the table */
@@ -94,19 +93,6 @@ Polynomial* InterpolationPolynomialNew(double (*f)(double), size_t degree,
             table[i][j] = table[i-1][j+1] - table[i-1][j];
         }
     }
-
-    /*
-    for (size_t i = 0; i <= degree; ++i) {
-        for (size_t j = 0; j <= degree - i; ++j) {
-            printf("%+.5lf\t", table[i][j]);
-        }
-        putchar('\n');
-    }
-    */
-
-
-
-
 
     /* Assign coefficients in polynomial. */
     for (size_t i = 0; i <= degree; ++i) {
@@ -124,7 +110,7 @@ double InterpolationPolynomialEval(Polynomial *p, double x, double start, double
     for (size_t i = 0; i <= p->degree; ++i) {
         double t = 1.0;
         for (size_t j = 0; j < i; ++j) {
-            t *= (x - (start + j*h));
+            t *= (x - (start + j*h)); /* (x - x0)(x - x1)... */
         }
         y += p->coefficients[i] * t;
     }

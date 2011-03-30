@@ -20,7 +20,39 @@
 
 \section{Interpolation}
 
+\subsection{Description du problème et méthodes utilisées}
+
+Étant donné la fonction $\sin(x)$ sur l'intervalle $[0, 3\pi]$, on doit
+trouver des polynômes de collocation d'ordre 1 à 5 qui approximent
+cette fonction.  Comme on peut choisir des points équidistants, nous
+avons choisi de trouver les polynômes avec la méthode de
+Newton-Grégory.
+
+La fonction \emph{InterpolationPolynomialNew} s'occupe de créer ce
+polynôme: elle prend en paramètres une fonction $f$ qui sert à créer
+un tableau de points, un entier positif \emph{degree} qui donne
+l'ordre désiré du polynôme et deux valeurs flottantes, \emph{start} et
+\emph{end}, qui définissent l'intervalle désiré.
+
+Comme les polynômes de collocation de la méthode Newton-Grégory ont la
+forme suivante:
+
+\[
+P(x) = c_0 + c_1(x-x_0) + \frac{c_2(x-x_0)(x-x_1)}{2!} + ...
+\]
+
+Et que de faire le développement d'un polynôme se fait en temps
+$O(n^2)$, nous avons choisi de ne pas regrouper les termes et de
+plutôt écrire une fonction spéciale
+\emph{InterpolationPolynomialPrint} pour faire l'affichage des
+polynômes de collocation.
+
 \subsection{Graphes de l'erreur des polynômes d'interpolation}
+
+Les graphiques suivants montrent l'erreur absolue faite entre
+l'approximation par polynôme et la fonction $\sin$.  On remarque au
+fur et à mesure que l'on ajoute des termes au polynôme, l'erreur
+absolue diminue.
 
 \includegraphics[scale=0.4]{data/p1}
 \includegraphics[scale=0.4]{data/p2}
