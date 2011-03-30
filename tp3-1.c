@@ -3,6 +3,8 @@
 #include <math.h>
 
 #define PI 3.14159265358979323846
+#define START 0
+#define END   3*PI
 
 double fact(int);
 double CalculateS(double, double, double, size_t);
@@ -83,7 +85,7 @@ Polynomial* InterpolationPolynomialNew(double (*f)(double), size_t degree,
     /* Initialize table */
     for (size_t i = 0; i <= degree; ++i) {
         table[0][i] = (*f)(start + i*h);
-        printf("  >> f(%.6lf) = %.6lf\n", (start + i*h), table[0][i]);
+        //printf("  >> f(%.6lf) = %.6lf\n", (start + i*h), table[0][i]);
     }
 
     /* Fill up the table */
@@ -93,12 +95,14 @@ Polynomial* InterpolationPolynomialNew(double (*f)(double), size_t degree,
         }
     }
 
+    /*
     for (size_t i = 0; i <= degree; ++i) {
         for (size_t j = 0; j <= degree - i; ++j) {
             printf("%+.5lf\t", table[i][j]);
         }
         putchar('\n');
     }
+    */
 
 
 
@@ -156,13 +160,9 @@ double f(double x) {
 }
 
 int main(void) {
-    double start = 0.1;
-    double end = 1.7;
-
     for (size_t i = 1; i <= 5; ++i) {
-        Polynomial *p = InterpolationPolynomialNew(&f, i, start, end);
-        InterpolationPolynomialPrint(p, start, end);
-        printf("%g %g\n", f(0.8), InterpolationPolynomialEval(p, 0.8, start, end));
+        Polynomial *p = InterpolationPolynomialNew(&f, i, START, END);
+        InterpolationPolynomialPrint(p, START, END);
         PolynomialFree(p);
     }
 
